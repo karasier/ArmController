@@ -1,5 +1,5 @@
-import controlP5.*;
-import processing.serial.*;
+import controlP5.*; // GUIのライブラリ
+import processing.serial.*; // シリアル通信用
 
 Serial port; // ポート
 ControlP5 cp5; // GUI用
@@ -9,7 +9,7 @@ Toggle[] toggle = new Toggle[5]; // トグルスイッチ
 
 int delta = 12; // サーボの角度の更新量
 int[] pos = {512,512,512,512,0}; // サーボの角度
-int[] center = {512,512,512,512,0}; // サーボの直立姿勢
+int[] center = {512,512,512,512,0}; // アームの直立姿勢時の角度
 boolean[] toggleState = {true,true,true,true,true}; // 動かすモータを決めるトグルスイッチの状態
 
 String[] com = Serial.list();
@@ -162,7 +162,7 @@ void draw()
   delay(100);
 }
 
-
+// アームを直立姿勢にする
 void moveCenter()
 {
   for(int i = 0; i < center.length; i++)
@@ -172,26 +172,35 @@ void moveCenter()
 }
 
 // データ送信
+// シリアル通信では8ビットずつデータが送られるため，角度はそのまま送れない
+// 角度を8ビットの範囲に変換送信
 void send()
 {
-  port.write(255);
+  port.write(255); // フラグの送信
+
+  // データの送信
   for(int i = 0; i < pos.length; i++)
   {
-    int data = int(map(pos[i],0,1023,0,254));
+    int data = int(map(pos[i],0,1023,0,254)); // データの変換
     port.write(data);
+    println(data);
   }
+
+  // 確認用
   println("sent!");
 }
 
+
+// posの確認
 void checkArray()
 {
   for(int elem:pos)
   {
     int data = int(map(elem,0,1023,0,254));
-    println(elem,data,int(map(data,0,254,0,1023)));
   }
 }
 
+// サーボの角度を範囲内に補正
 void correct()
 {
   for(int i = 0; i < pos.length; i++)
@@ -204,6 +213,7 @@ void correct()
   }
 }
 
+// 正しいデータが送信できたか確認
 void serialEvent(Serial p){
   int x = p.read();
   println(int(map(x,0,254,0,1023)));
