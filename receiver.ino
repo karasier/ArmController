@@ -64,7 +64,7 @@ void setServo()
 {
   for(int i = 0; i < 5; i++)
   {
-    SetPosition(i,pos[i]);
+    SetPosition(i+1,pos[i]);
     delay(10);
   }
 }
