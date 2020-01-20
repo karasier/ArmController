@@ -48,7 +48,7 @@ void setup()
      .setPosition(100,height-150)
      .setSize(100,100);
 
-　// 掴む
+  // 掴む
   grab = cp5.addButton("grab")
             .setLabel("grab")
             .setPosition(width-200,50)
@@ -197,6 +197,7 @@ void checkArray()
   for(int elem:pos)
   {
     int data = int(map(elem,0,1023,0,254));
+    println(elem,data,int(map(data,0,254,0,1023)));
   }
 }
 
