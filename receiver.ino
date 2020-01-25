@@ -3,7 +3,7 @@
 int flag = 0; // シリアル通信のデータ受信フラグ
 int count = 0; // シリアル通信でデータを受信した回数
 
-int pos[5] = {512,512,512,512,0}; // サーボモータの角度
+int pos[5] = {512,512,512,512,512}; // サーボモータの角度
 
 void setup()
 {
@@ -22,9 +22,6 @@ void loop()
       {
         // データの読み取り
         pos[count] = Serial.read();
-
-        // 確認用
-        Serial.write(pos[count]);
         count++;
       }
 
@@ -65,6 +62,5 @@ void setServo()
   for(int i = 0; i < 5; i++)
   {
     SetPosition(i+1,pos[i]);
-    delay(10);
   }
 }
