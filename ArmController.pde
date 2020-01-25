@@ -8,8 +8,8 @@ Button grab,release,up,down,right,left; // ボタン
 Toggle[] toggle = new Toggle[5]; // トグルスイッチ
 
 int delta = 12; // サーボの角度の更新量
-int[] pos = {512,512,512,512,0}; // サーボの角度
-int[] center = {512,512,512,512,0}; // アームの直立姿勢時の角度
+int[] pos = {512,512,512,512,512}; // サーボの角度
+int[] center = {512,512,512,512,512}; // アームの直立姿勢時の角度
 boolean[] toggleState = {true,true,true,true,true}; // 動かすモータを決めるトグルスイッチの状態
 
 String[] com = Serial.list();
@@ -31,8 +31,7 @@ void setup()
       println("failed");
       continue;
     }
-  }
-  //port = new Serial(this, "COM20", 9600);
+  }  
 
   cp5 = new ControlP5(this);
 
@@ -113,14 +112,14 @@ void draw()
   {
     if(right.isPressed())
     {
-      if(pos[0] < 1023)
-        pos[0] += delta;
+      if(pos[0] > 0)
+        pos[0] -= delta;
     }
 
     if(left.isPressed())
     {
-      if(pos[0] > 0)
-        pos[0] -= delta;
+      if(pos[0] < 1023)
+        pos[0] += delta;
     }
   }
 
@@ -147,13 +146,13 @@ void draw()
     if(grab.isPressed())
     {
       if(pos[pos.length-1] < 512)
-        pos[pos.length-1] += delta;
+        pos[pos.length-1] += 30;
     }
 
     if(release.isPressed())
     {
       if(pos[pos.length-1] > 0)
-        pos[pos.length-1] -= delta;
+        pos[pos.length-1] -= 30;
     }
   }
 
