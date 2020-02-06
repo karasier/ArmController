@@ -1,4 +1,4 @@
-#include <ax12.h>
+#include <ax12.h> // サーボ用
 
 int flag = 0; // シリアル通信のデータ受信フラグ
 int count = 0; // シリアル通信でデータを受信した回数
@@ -22,13 +22,17 @@ void loop()
       {
         // データの読み取り
         pos[count] = Serial.read();
+
         count++;
       }
 
       // データの受信が終わったら，受信した回数とフラグを0に戻す
       if(count >= 5)
       {
+        // データ受信回数のリセット
         count = 0;
+        
+        // フラグのリセット
         flag = 0;
 
         convert(); // データの変換
@@ -52,6 +56,9 @@ void convert()
 {
   for(int i = 0; i < 5; i++)
   {
+    // map関数でデータを変換
+    // 0 ～ 254 → 0 ～ 1023
+    // 255はフラグに使用
     pos[i] = int(map(pos[i],0,254,0,1023));
   }
 }
@@ -60,7 +67,7 @@ void convert()
 void setServo()
 {
   for(int i = 0; i < 5; i++)
-  {
+  {   
     SetPosition(i+1,pos[i]);
   }
 }
