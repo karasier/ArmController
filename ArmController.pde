@@ -12,18 +12,18 @@ int[] pos = {512,512,512,512,512}; // サーボの角度
 int[] center = {512,512,512,512,512}; // アームの直立姿勢時の角度
 boolean[] toggleState = {true,true,true,true,true}; // 動かすモータを決めるトグルスイッチの状態
 
-String[] com = Serial.list();
+String[] com = Serial.list(); // ポートのリスト
 
 void setup()
 {
-  size(700,700);
+  size(700,700); // ウインドウのサイズ
 
   // 接続できるポートを探して接続
   for (int i=0; i < com.length ; i++)
   {
     print(com[i]+"     ");
     try {
-      port = new Serial(this, com[i], 9600);
+      port = new Serial(this, com[i], 9600); // シリアル通信の開始
       println("connected!");
     }
     catch(Exception e)
@@ -47,13 +47,13 @@ void setup()
      .setPosition(100,height-150)
      .setSize(100,100);
 
-  // 掴む
+  // 掴むボタン
   grab = cp5.addButton("grab")
             .setLabel("grab")
             .setPosition(width-200,50)
             .setSize(200,200);
 
-  // 離す
+  // 離すボタン
   release = cp5.addButton("release")
             .setLabel("release")
             .setPosition(width-200,height-350)
@@ -83,7 +83,7 @@ void setup()
             .setPosition(0,250)
             .setSize(200,100);
 
-  // トグルスイッチ
+  // 動かすモータを決めるトグルスイッチ
   for(int i = 0; i < 5; i++)
   {
     toggle[i] = cp5.addToggle(str(i+1))
@@ -93,8 +93,10 @@ void setup()
               .setSize(40, 30);
   }
 
-  // 初期化
+  // 角度の初期化
   moveCenter();
+  
+  // データの送信
   send();
 }
 
@@ -108,50 +110,60 @@ void draw()
     toggleState[i] = toggle[i].getBooleanValue();
   }
 
+  // サーボ1が有効のとき
   if(toggleState[0])
   {
+    // 右ボタンが押されたとき
     if(right.isPressed())
     {
       if(pos[0] > 0)
         pos[0] -= delta;
     }
 
+    // 左ボタンが押されたとき
     if(left.isPressed())
-    {
+    {      
       if(pos[0] < 1023)
         pos[0] += delta;
     }
   }
 
+  // 上ボタンが押されたとき
   if(up.isPressed())
   {
     for(int i = 1; i < 4; i++)
     {
+      // サーボが有効で角度が1023より小さいとき
       if(pos[i] < 1023 && toggleState[i])
         pos[i] += delta;
     }
   }
 
+  // 下ボタンが押されたとき
   if(down.isPressed())
   {
     for(int i = 1; i < 4; i++)
     {
+      // サーボが有効で角度が0より大きいとき
       if(pos[i] > 0 && toggleState[i])
         pos[i] -= delta;
     }
   }
 
+  // サーボ5が有効のとき
   if(toggleState[4])
   {
+    // 掴むボタンが押されたとき
     if(grab.isPressed())
     {
-      if(pos[pos.length-1] < 512)
+      if(pos[pos.length-1] < 1024)
         pos[pos.length-1] += 30;
     }
 
+    // 離すボタンが押されたとき
     if(release.isPressed())
     {
-      if(pos[pos.length-1] > 0)
+      if(pos[pos.length-1] >= 512)
         pos[pos.length-1] -= 30;
     }
   }
@@ -181,12 +193,8 @@ void send()
   for(int i = 0; i < pos.length; i++)
   {
     int data = int(map(pos[i],0,1023,0,254)); // データの変換
-    port.write(data);
-    println(data);
+    port.write(data);    
   }
-
-  // 確認用
-  println("sent!");
 }
 
 
@@ -211,10 +219,4 @@ void correct()
     if(pos[i] > 1023)
       pos[i] = 1023;
   }
-}
-
-// 正しいデータが送信できたか確認
-void serialEvent(Serial p){
-  int x = p.read();
-  println(int(map(x,0,254,0,1023)));
 }
